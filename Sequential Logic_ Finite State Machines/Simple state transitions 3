@@ -1,0 +1,96 @@
+HDLBits HDLBits
+Problem Set
+Browse Problem Set
+Problem Set Stats
+User Rank List
+Simulation
+Run a Simulation (Icarus Verilog)
+My Profile
+Log in/out
+Profile Settings
+My Stats
+Help
+Getting Started
+About HDLBits
+Bugs and Suggestions
+01xz.net
+01xz.net Home
+HDLBits — Verilog practice
+ASMBits — Assembly language practice
+CPUlator — Nios II, ARMv7, and MIPS simulator
+Search HDLBits
+ Search
+Fsm3comb
+fsm2sPreviousNextfsm3onehot
+
+The following is the state transition table for a Moore state machine with one input, one output, and four states. Use the following state encoding: A=2'b00, B=2'b01, C=2'b10, D=2'b11.
+
+Implement only the state transition logic and output logic (the combinational logic portion) for this state machine. Given the current state (state), compute the next_state and output (out) based on the state transition table.
+
+State	Next state	Output
+in=0	in=1
+A	A	B	0
+B	C	B	0
+C	A	D	0
+D	C	B	1
+Module Declaration
+module top_module(
+    input in,
+    input [1:0] state,
+    output [1:0] next_state,
+    output out); 
+Write your solution here
+
+[Load a previous submission]
+Load
+irrespective of in
+//A=2'b00, B=2'b01, C=2'b10, D=2'b11.
+module top_module(
+    input in,
+    input [1:0] state,
+    output [1:0] next_state,
+    output out); //
+​
+    parameter A=0, B=1, C=2, D=3;
+    
+    //combinational logic and output logic combined
+    always@(*)begin
+        out <= 0; //default case
+        case(state)
+            A : begin 
+                if(in == 1'b1) next_state = B; // A to B
+                else next_state <= A; // A to A
+            end
+            B : begin
+                if(in == 1'b1) next_state = B; // B to B
+                else next_state <= C;// B to C
+            end
+            C : begin
+                if(in == 1'b1) next_state = D; // C to D
+                else next_state <= A;// C to A
+            end
+            D : begin
+                out <= 1; // out is 1 irrespective of in
+                if(in == 1'b1) next_state = B; // D to B
+                else next_state <= C;// D to C
+            end
+            default : next_state <= A;
+        endcase
+    end
+    
+    
+    
+endmodule
+​
+ 
+Upload a source file... 
+
+
+exams/ece241_2013_q12rule90rule110conwaylifefsm1fsm1sfsm2fsm2s ·
+fsm3comb
+
+ 
+· fsm3onehotfsm3fsm3sexams/ece241_2013_q4lemmings1lemmings2lemmings3lemmings4
+fsm2sPreviousNextfsm3onehot
+This page was last edited on 3 October 2016, at 04:45.
+About HDLBits

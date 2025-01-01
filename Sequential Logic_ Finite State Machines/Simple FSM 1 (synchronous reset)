@@ -1,0 +1,31 @@
+module top_module(clk, reset, in, out);
+    input clk;
+    input reset;    // Synchronous reset to state B
+    input in;
+    output reg out;
+
+    // Declare state name parameters
+    parameter A = 0, B = 1;
+    reg present_state, next_state;
+
+    // Sequential logic: State transitions
+    always @(posedge clk) begin
+        if (reset)   
+            present_state <= B;  // Synchronous reset sets state to B
+        else
+            present_state <= next_state;
+    end
+
+    // Combinational logic: Next state logic
+    always @(*) begin
+        case (present_state)
+            B: next_state = in ? B : A;
+            A: next_state = in ? A : B;
+        endcase
+    end
+
+    // Output logic
+    always @(*) begin
+        out = (present_state == B);
+    end
+endmodule

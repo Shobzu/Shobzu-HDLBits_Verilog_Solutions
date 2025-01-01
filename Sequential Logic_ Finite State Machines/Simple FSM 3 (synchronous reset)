@@ -1,0 +1,47 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,
+    output out); //
+
+    reg[1:0] present_state , next_state;
+    parameter A=0,B=1,C=2,D=3;
+
+    // State transition logic
+    always@(*)begin
+        //out <= 0; //default case
+        case(present_state)
+            A : begin 
+                if(in == 1'b1) next_state = B; // A to B
+                else next_state = A; // A to A
+            end
+            B : begin
+                if(in == 1'b1) next_state = B; // B to B
+                else next_state = C;// B to C
+            end
+            C : begin
+                if(in == 1'b1) next_state = D; // C to D
+                else next_state = A;// C to A
+            end
+            D : begin
+                //out <= 1; // out is 1 irrespective of in
+                if(in == 1'b1) next_state = B; // D to B
+                else next_state = C;// D to C
+            end
+            default : next_state = A;
+        endcase
+    end
+    
+
+    // State flip-flops with asynchronous reset
+    always@(posedge clk )begin
+        if(reset) present_state <= A;
+        else present_state <= next_state;
+    end
+
+    // Output logic
+    always @(*) begin
+        out <= (present_state == D); // Output is 1 when present state is D
+    end
+
+endmodule

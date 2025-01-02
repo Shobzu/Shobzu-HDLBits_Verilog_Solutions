@@ -1,0 +1,46 @@
+module top_module (
+    input clk,
+    input reset,
+    input [3:1] s,     // Sensor inputs
+    output reg fr3,    // Flow rate control outputs
+    output reg fr2,
+    output reg fr1,
+    output reg dfr     // Supplemental flow rate
+);
+
+    reg [3:1] olds;    // Register to store the previous state of sensors
+    reg oldr;          // Register to store the previous reset state
+
+    always @(posedge clk) begin
+        olds <= s;      // Update previous sensor state
+        oldr <= reset;  // Update previous reset state
+        
+        if (reset) begin
+            
+            {dfr, fr3, fr2, fr1} <= 4'b1111; // During reset, set all outputs to maximum flow
+        end else begin
+            // Handle dfr logic 
+            if (olds > s || s == 3'b000) begin
+                
+                dfr <= 1;// If the Water level dropped or all sensors are inactive -> Set dfr to 1
+                
+             //important edge case
+            end else if (olds == s && ~oldr) begin
+                // If sensors didn't change and previously not in reset -> Keep dfr unchanged
+                dfr <= dfr;
+            end else begin
+                // Otherwise, reset dfr to 0
+                dfr <= 0;
+            end
+
+            // Flow rate logic based on current sensor state
+            case (s)
+                3'b111: {fr3, fr2, fr1} <= 3'b000; // Above S3, no flow
+                3'b011: {fr3, fr2, fr1} <= 3'b001; // Between S3 and S2, FR1 = 1
+                3'b001: {fr3, fr2, fr1} <= 3'b011; // Between S2 and S1, FR1 = 1, FR2 = 1
+                3'b000: {fr3, fr2, fr1} <= 3'b111; // Below S1, maximum flow
+            endcase
+        end
+    end
+
+endmodule

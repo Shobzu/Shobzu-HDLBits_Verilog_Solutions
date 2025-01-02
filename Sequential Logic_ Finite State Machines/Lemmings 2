@@ -1,0 +1,50 @@
+//Condition 1 - Being bumped while falling does not affect the walking direction 
+//Condition 2 - being bumped in the same cycle as ground disappears (but not yet falling) - does not affect the walking direction.
+//condition 3- when the ground reappears while still falling, also does not affect the walking direction.
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    output walk_left,
+    output walk_right,
+    output aaah ); 
+    
+    parameter left = 0 , right = 1 , rfalling = 2 , lfalling = 3;
+    reg[1:0] state , next_state;
+    
+    always@(posedge clk , posedge areset)begin
+        if(areset) state <= left;
+        else state <= next_state;
+    end
+    
+    always@(*)begin
+        case(state)
+            left : begin
+                if( bump_left && ground) next_state = right; // when bumped, direction changes to right
+                else if(~ground) next_state = lfalling; //starts falling with the same direction
+                else next_state = left; 
+            end
+            right : begin                
+                if(bump_right && ground) next_state = left; // when bumped, direction changes to left
+                else if(~ground) next_state = rfalling;//starts falling with the same direction
+                else next_state = right; 
+            end
+            lfalling : begin
+                if(ground) next_state = left;
+                else next_state = lfalling;
+            end
+            rfalling : begin
+                if(ground) next_state = right;
+                else next_state = rfalling;
+            end
+            default : next_state = left;
+       endcase
+    end
+                   
+    assign walk_left = ( state == left );
+    assign walk_right = (state == right);
+    assign aaah = (state == lfalling || state == rfalling); 
+                   
+endmodule

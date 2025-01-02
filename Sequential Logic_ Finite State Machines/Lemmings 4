@@ -1,0 +1,80 @@
+module top_module (
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging
+);
+
+    parameter left = 0, right = 1, lfalling = 2, rfalling = 3, ldig = 4, rdig = 5, splat = 6;
+    reg [10:0] count;
+    reg [2:0] state, next_state;
+
+    // State and count updates
+    always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            state <= left;
+            //count <= 0;
+        end else begin
+            state <= next_state;
+            if ((state == lfalling || state == rfalling) ) 
+                count <= count + 1;  
+            else 
+                count <= 0;
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            left: begin
+                if (~ground) next_state = lfalling;
+                else if (ground && dig) next_state = ldig;
+                else if (ground && ~dig && bump_left) next_state = right;
+                else next_state = left;
+            end
+            right: begin
+                if (~ground) next_state = rfalling;
+                else if (ground && dig) next_state = rdig;
+                else if (ground && ~dig && bump_right) next_state = left;
+                else next_state = right;
+            end
+            lfalling: begin
+                if (ground) begin
+                    if(count>19) next_state = splat;
+                    else next_state = left;
+                end
+                else next_state = lfalling;
+            end
+            rfalling: begin
+                if (ground) begin
+                    if(count>19) next_state = splat;
+                    else next_state = right;
+                end
+                else next_state = rfalling;
+            end
+            ldig: begin
+                if (~ground) next_state = lfalling;
+                else next_state = ldig;
+            end
+            rdig: begin
+                if (~ground) next_state = rfalling;
+                else next_state = rdig;
+            end
+            splat: next_state = splat;
+            default: next_state = left;
+        endcase
+    end
+
+    // Output logic
+    assign walk_left = (state == left);
+    assign walk_right = (state == right);
+    assign aaah = (state == lfalling || state == rfalling);
+    assign digging = (state == ldig || state == rdig);
+
+endmodule

@@ -1,0 +1,43 @@
+module top_module(
+    input clk,
+    input reset,    // Synchronous reset
+    input in,
+    output disc,
+    output flag,
+    output err);
+    
+    reg[3:0] count;
+    parameter idle = 0, recieve = 1, d = 2, f = 3, error = 4 , btw = 5; // d for disc state , f for flag state, btw for a intermediate state in between recieve and (flag and error)
+    reg[2:0] state,next;
+    
+    always@(posedge clk)begin
+        if(reset)begin
+            state <= idle;
+            count <= 0;
+        end
+        else begin
+            state <= next;
+            case(next)
+                recieve : count <= count + 1;
+                default:count <= 0;
+            endcase
+        end
+ 	end
+    always@(*)begin
+        case(state)
+            idle : next = in ? recieve : idle;
+            recieve : begin
+                if(count ==5 ) next = in ? btw : d;
+                else next = in ? recieve : idle;
+            end
+            d: next = in ? recieve : idle;
+            btw : next = in ? error : f;
+            f : next = in ? recieve : idle;
+            error : next = in ? error : idle;
+        endcase
+    end
+                  
+    assign disc = (state == d);
+    assign flag = (state == f);
+    assign err = (state == error);
+endmodule

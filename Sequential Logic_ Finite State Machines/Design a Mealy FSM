@@ -1,0 +1,36 @@
+module top_module (
+    input clk,
+    input aresetn,    // Asynchronous active-low reset
+    input x,
+    output reg z );   // Output z must be declared as reg since it is assigned in an always block
+    
+    // State definitions
+    parameter IDLE = 0, ONE = 1, ONE_ZERO = 2;
+    reg [1:0] state, next;
+
+    // Sequential logic: State transitions on clock edge or reset
+    always @(posedge clk or negedge aresetn) begin
+        if (~aresetn)
+            state <= IDLE; // Asynchronous reset
+        else
+            state <= next;
+    end
+
+    // Combinational logic: Next-state logic
+    always @(*) begin
+        case (state)
+            IDLE: next = x ? ONE : IDLE;
+            ONE: next = x ? ONE : ONE_ZERO;
+            ONE_ZERO: next = x ? ONE : IDLE;
+            default: next = IDLE;
+        endcase
+    end
+
+    // Output logic: Assign z based on current state and input
+    always @(*) begin
+        case (state)
+            ONE_ZERO: z = x ? 1 : 0; // Output z = 1 when in ONE_ZERO and x = 1
+            default: z = 0;          // z = 0 in all other states
+        endcase
+    end
+endmodule

@@ -1,0 +1,29 @@
+module top_module (
+    input clk,
+    input areset,
+    input x,
+    output z
+); 
+   	parameter s0 =0 , s1 = 1 , s2 = 2;
+    reg[1:0] state, next;
+    always@(*)begin
+        case(state)
+            s0 : next = x ? s1 : s0;
+            s1 : next = s2;
+            s2 : next = s2;
+        endcase
+    end
+        always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            state <= s0;   
+            z <= 0;        
+        end else begin
+            state <= next; // Update state
+            case (next)
+                s0: z <= 0;         
+                s1: z <= 1;         
+                s2: z <= ~x;        
+            endcase
+        end
+    end
+endmodule 

@@ -1,0 +1,33 @@
+module top_module (
+    input clk,
+    input areset,
+    input x,
+    output z
+); 
+
+    parameter s0=0,s1=1;
+    reg state,next;
+    always@(*)begin
+        case(state)
+            s0:begin
+                if(x)begin
+                    z = 1;
+                    next = s1;
+                end
+                else begin
+                    z = 0;
+                    next = s0;
+                end
+            end
+            s1:begin
+                z = ~x;
+                next = s1;
+            end
+        endcase
+    end
+    
+    always@(posedge clk, posedge areset)begin
+        if(areset)  state <= s0;
+        else  state <= next;
+    end
+    endmodule

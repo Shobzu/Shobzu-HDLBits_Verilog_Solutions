@@ -1,0 +1,42 @@
+//The FSM remains in state A as long as s = 0, and it moves to state B when s = 1
+//in state B the FSM examines the value of the input w in the next three clock cycles.
+// If w = 1 in exactly two of these clock cycles, then the FSM has to set an output z to 1 in the following clock cycle.
+module top_module (
+    input clk,
+    input reset,   // Synchronous reset
+    input s,
+    input w,
+    output z
+);
+    reg state,next;
+    reg[1:0] cnt_clk , cnt;
+    parameter a =0, b=1;
+    always@(*)begin
+        case(state)
+            a : next = s ? b : a;
+            b : next = b;
+        endcase
+    end
+
+    always@(posedge clk)begin
+        if(reset) begin
+            state <= a;
+            z <= 0;
+            cnt_clk <= 0;
+            cnt <= 0;
+        end
+        else begin
+            state <= next;
+            z <= 0;
+            if(state==b)begin
+                cnt_clk = cnt_clk+1;
+                if(w) cnt = cnt+1;
+                if(cnt_clk==3)begin
+                    if(cnt==2) z<= 1;
+                    cnt_clk <= 0;
+                    cnt <= 0;
+                end
+            end
+        end
+    end
+endmodule

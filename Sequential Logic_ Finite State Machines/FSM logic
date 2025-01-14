@@ -1,0 +1,84 @@
+HDLBits HDLBits
+Problem Set
+Browse Problem Set
+Problem Set Stats
+User Rank List
+Simulation
+Run a Simulation (Icarus Verilog)
+My Profile
+Log in/out
+Profile Settings
+My Stats
+Help
+Getting Started
+About HDLBits
+Bugs and Suggestions
+01xz.net
+01xz.net Home
+HDLBits — Verilog practice
+ASMBits — Assembly language practice
+CPUlator — Nios II, ARMv7, and MIPS simulator
+Search HDLBits
+ Search
+Exams/2014 q3c
+exams/2014_q3bfsmPreviousNextexams/m2014_q6b
+
+Given the state-assigned table shown below, implement the logic functions Y[0] and z.
+
+Present state
+y[2:0]	Next state Y[2:0]	Output z
+x=0	x=1
+000	000	001	0
+001	001	100	0
+010	010	001	0
+011	001	010	1
+100	011	100	1
+Module Declaration
+module top_module (
+    input clk,
+    input [2:0] y,
+    input x,
+    output Y0,
+    output z
+);
+Write your solution here
+
+[Load a previous submission]
+Load
+module top_module (
+    input clk,
+    input [2:0] y,
+    input x,
+    output Y0,
+    output z
+);
+    reg[2:0] next;
+    parameter s0 = 3'b000, s1 = 3'b001 , s2 = 3'b010 , s3 = 3'b011 , s4 = 3'b100;
+    always@(*)begin
+        case(y)
+            s0 : next = x ? s1 : s0;
+            s1 : next = x ? s4 : s1;
+            s2 : next = x ? s1 : s2;
+            s3 : next = x ? s2 : s1; //z=1
+            s4 : next = x ? s4 : s3; //z=1
+        endcase
+    end
+    
+    assign Y0 = next[0];
+    assign z = (y == s3 || y == s4);
+endmodule
+​
+​
+​
+ 
+Upload a source file... 
+
+
+fsm_serialdatafsm_serialdpfsm_hdlcexams/ece241_2013_q8exams/ece241_2014_q5aexams/ece241_2014_q5bexams/2014_q3fsmexams/2014_q3bfsm ·
+exams/2014_q3c
+
+ 
+· exams/m2014_q6bexams/m2014_q6cexams/m2014_q6exams/2012_q2fsmexams/2012_q2bexams/2013_q2afsmexams/2013_q2bfsmexams/review2015_count1k
+exams/2014_q3bfsmPreviousNextexams/m2014_q6b
+This page was last edited on 11 October 2018, at 08:10.
+About HDLBits
